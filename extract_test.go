@@ -1,6 +1,7 @@
 package extract
 
 import (
+	"encoding/json"
 	"reflect"
 	"testing"
 )
@@ -42,14 +43,14 @@ Upgrade-Insecure-Requests: 1`,
 }
 
 // //Runner
-// func Test_Walker(t *testing.T) {
-// 	out := Walker()
-// 	if cap(out) < 1 {
-// 		t.Errorf("no file found %v", out)
-// 	}
-// 	j, err := json.Marshal(out)
-// 	write("out.json", j)
-// 	if err != nil {
-// 		panic(err)
-// 	}
-// }
+func Test_Walker(t *testing.T) {
+	out := Walker()
+	if cap(out) < 1 {
+		t.Errorf("no file found %v", out)
+	}
+	j, err := json.Marshal(out)
+	write("out.json", j)
+	if err != nil {
+		panic(err)
+	}
+}

@@ -10,9 +10,15 @@ import (
 	"golang.org/x/net/html/charset"
 )
 
-type eidCveMap map[string][]string
+type cve struct {
+	Id   string `json:"id"`
+	Desc string `json:"desc"`
+}
 
-func ParseExploitCvesMap() (eidCveMap eidCveMap, err error) {
+type eidCveMap map[string][]cve
+
+func ParseExploitCvesMap() (ecm eidCveMap, err error) {
+	eidCveMap := eidCveMap{}
 	cveXML, err := ioutil.ReadFile("../allitems.xml")
 	if err != nil {
 		panic(err)
@@ -28,25 +34,13 @@ func ParseExploitCvesMap() (eidCveMap eidCveMap, err error) {
 		for _, ref := range vuln.Refs.Ref {
 			if strings.HasPrefix(ref.Url, "https://www.exploit-db.com/exploits/") {
 				eid := strings.TrimSuffix(strings.TrimPrefix(ref.Url, "https://www.exploit-db.com/exploits/"), "/")
-				eidCveMap[eid] = append(eidCveMap[eid])
-				continue
+				eidCveMap[eid] = append(eidCveMap[eid], cve{Id: vuln.Name, Desc: vuln.Desc})
 			}
-
-			ss := strings.Split(ref.Text, ":")
-			if len(ss) != 2 {
-				continue
-			}
-			refType, exploitID := ss[0], ss[1]
-			// https://cve.mitre.org/data/refs/index.html
-			if refType != "EXPLOIT-DB" {
-				continue
-			}
-			eidCveMap[exploitID] = append(eidCveMap[exploitID], vuln.Name)
 		}
 	}
 	return eidCveMap, nil
 }
 
-func queryRefMap(eidCveMap eidCveMap, exploitID string) []string {
+func queryRefMap(eidCveMap eidCveMap, exploitID string) []cve {
 	return eidCveMap[exploitID]
 }

@@ -25,10 +25,15 @@ func write(path string, data []byte) error {
 
 type Eid struct {
 	Info     Entry    `json:"info"`
+	CVE      []cve    `json:"cve"`
 	Requests []string `json:"requests"`
 }
 
 func Walker() []Eid {
+	eidCveMap, err := ParseExploitCvesMap()
+	if err != nil {
+		panic(err)
+	}
 	csvFile, err := os.Open("../files_exploits.csv")
 	db := csvRead(csvFile)
 	if err != nil {
@@ -48,7 +53,8 @@ func Walker() []Eid {
 				if err != nil {
 					panic(err)
 				}
-				entry := Eid{Info: row, Requests: Extract(read(path))}
+				cves := queryRefMap(eidCveMap, row.Id)
+				entry := Eid{Info: row, CVE: cves, Requests: Extract(read(path))}
 				if len(entry.Requests) > 0 {
 					out = append(out, entry)
 				}

@@ -10,6 +10,6 @@ func TestParseExploitCvesMap(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
-	//out := queryRefMap(eidCveMap, "11")
-	log.Println(eidCveMap)
+	out := queryRefMap(eidCveMap, "8545")
+	log.Println(out)
 }
