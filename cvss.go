@@ -9,14 +9,15 @@ import (
 )
 
 type info struct {
-	Problemtype Problemtype
-	Impact      DefImpact
+	CWE    cwe
+	Impact DefImpact
 }
 
 type NVD map[string]info
 
 func parseNVD() NVD {
 	nvd := NVD{}
+	cwe_db := parseCWE()
 	err := filepath.Walk("../nvd",
 		func(path string, i os.FileInfo, err error) error {
 			if err != nil {
@@ -32,8 +33,16 @@ func parseNVD() NVD {
 				if err != nil {
 					panic(err)
 				}
+
 				for _, cve := range data.CVEItems {
-					nvd[cve.CVE.CVEDataMeta.ID] = info{Problemtype: cve.CVE.Problemtype, Impact: cve.Impact}
+					cwe_item := cwe{}
+					for _, problemType := range cve.CVE.Problemtype.ProblemtypeData {
+						for _, description := range problemType.Description {
+							id := strings.TrimLeft(description.Value, "CWE-")
+							cwe_item = queryCWEbyId(id, cwe_db)
+						}
+					}
+					nvd[cve.CVE.CVEDataMeta.ID] = info{CWE: cwe_item, Impact: cve.Impact}
 				}
 			}
 			return nil

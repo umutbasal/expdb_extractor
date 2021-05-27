@@ -13,6 +13,7 @@ import (
 type cve struct {
 	Id   string `json:"id"`
 	Desc string `json:"desc"`
+	NVD  info   `json:"nvd"`
 }
 
 type eidCveMap map[string][]cve
@@ -20,6 +21,7 @@ type eidCveMap map[string][]cve
 func ParseExploitCvesMap() (ecm eidCveMap, err error) {
 	eidCveMap := eidCveMap{}
 	cveXML, err := ioutil.ReadFile("../allitems.xml")
+	nvd := parseNVD()
 	if err != nil {
 		panic(err)
 	}
@@ -34,7 +36,8 @@ func ParseExploitCvesMap() (ecm eidCveMap, err error) {
 		for _, ref := range vuln.Refs.Ref {
 			if strings.HasPrefix(ref.Url, "https://www.exploit-db.com/exploits/") {
 				eid := strings.TrimSuffix(strings.TrimPrefix(ref.Url, "https://www.exploit-db.com/exploits/"), "/")
-				eidCveMap[eid] = append(eidCveMap[eid], cve{Id: vuln.Name, Desc: vuln.Desc})
+				cvss := queryNVDbyCve(vuln.Name, nvd)
+				eidCveMap[eid] = append(eidCveMap[eid], cve{Id: vuln.Name, Desc: vuln.Desc, NVD: cvss})
 			}
 		}
 	}
