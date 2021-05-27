@@ -10,14 +10,13 @@ let res = data
 // 1827 total
 // 330 with cves
 
-console.log(res.length)
 function getRandomInt(max) {
     return Math.floor(Math.random() * max);
 }
 
 function run(){
     let rand = getRandomInt(res.length)
-    return (res[rand])
+    return (JSON.stringify(res[rand]))
 }
 
 console.log(run())

@@ -3,6 +3,7 @@ module github.com/umutbasal/eid
 go 1.15
 
 require (
+	github.com/atombender/go-jsonschema v0.9.0 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.0 // indirect
 	github.com/go-stack/stack v1.8.0 // indirect
 	github.com/gobuffalo/here v0.6.2 // indirect
